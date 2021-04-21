@@ -19,15 +19,14 @@ ${VERSIONS}:
 
 ## Build VERSIONS
 build:
+	$(QUIET) $(MAKE) -e ${VERSIONS}
+
 	$(QUIET) DOCKER_BUILDKIT=${DOCKER_BUILDKIT} docker build --compress \
 		--build-arg NGX_BROTLI_MODULE_COMMIT=${NGX_BROTLI_MODULE_COMMIT} \
 		--build-arg NGINX_VERSION=$(lastword ${VERSIONS}) \
 		--cache-from type=local,src=/tmp/.buildx-cache \
 		--cache-to type=local,dest=/tmp/.buildx-cache-new \
-		--tag ghcr.io/${USER}/docker-nginx-brotli-so:latest \
+		--tag ghcr.io/${USER}/docker-nginx-brotli-so \
 		--file alpine.Dockerfile .
-
-	$(QUIET) $(MAKE) -e ${VERSIONS}
-
 	$(QUIET) DOCKER_BUILDKIT=${DOCKER_BUILDKIT} docker push \
-		ghcr.io/${USER}/docker-nginx-brotli-so:latest
+		ghcr.io/${USER}/docker-nginx-brotli-so
