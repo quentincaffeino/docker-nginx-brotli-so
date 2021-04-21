@@ -12,9 +12,9 @@ ${VERSIONS}:
 		--build-arg NGINX_VERSION=$@ \
 		-t ghcr.io/${USER}/docker-nginx-brotli-so:$@-alpine \
 		--file alpine.Dockerfile .
+	$(QUIET) DOCKER_BUILDKIT=${DOCKER_BUILDKIT} docker push \
+		ghcr.io/${USER}/docker-nginx-brotli-so:$@-alpine
 
 ## Build VERSIONS
 build:
 	$(QUIET) $(MAKE) -e ${VERSIONS}
-	$(QUIET) DOCKER_BUILDKIT=${DOCKER_BUILDKIT} docker push -a \
-		ghcr.io/${USER}/docker-nginx-brotli-so
