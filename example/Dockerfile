@@ -1,6 +1,6 @@
 ARG NGINX_VERSION=1.19.10
 
-FROM quentincaffeino/docker-nginx-brotli-so:${NGINX_VERSION}-alpine as docker-nginx-brotli-so
+FROM ghcr.io/quentincaffeino/docker-nginx-brotli-so:${NGINX_VERSION}-alpine as docker-nginx-brotli-so
 
 # Final target
 FROM nginx:${NGINX_VERSION}-alpine
