@@ -34,7 +34,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build and push images
-        run: make build USER=${{ github.repository_owner }}
+        run: make build USER=${{ github.repository_owner }} QUIET=
         # This ugly bit is necessary if you don't want your cache to grow forever
         # till it hits GitHub's limit of 5GB.
         # Temp fix
