@@ -1,10 +1,12 @@
 ARG NGINX_VERSION=1.19.10
+ARG NGX_BROTLI_MODULE_COMMIT=9aec15e2aa6feea2113119ba06460af70ab3ea62
+
 
 FROM curlimages/curl:7.76.1 as download-ngx_brotli
 
 WORKDIR /tmp
 
-ARG NGX_BROTLI_MODULE_COMMIT=9aec15e2aa6feea2113119ba06460af70ab3ea62
+ARG NGX_BROTLI_MODULE_COMMIT
 
 RUN curl -OLC - "https://github.com/google/ngx_brotli/archive/${NGX_BROTLI_MODULE_COMMIT}.tar.gz" \
   && ls -al /tmp
