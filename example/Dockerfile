@@ -12,6 +12,4 @@ COPY --from=nginx-brotli-so /nginx-brotli-so/ngx_http_brotli_filter_module.so /e
 COPY --from=nginx-brotli-so /nginx-brotli-so/ngx_http_brotli_static_module.so /etc/nginx/modules/ngx_http_brotli_static_module.so
 
 COPY nginx.conf /etc/nginx/nginx.conf
-
-RUN mkdir -p /usr/share/nginx/html/ && \
-  echo "<html>Hello world</html>" > /usr/share/nginx/html/index.html
+COPY index.html /usr/share/nginx/html/
