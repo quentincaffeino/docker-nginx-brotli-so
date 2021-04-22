@@ -14,11 +14,11 @@ RUN curl -OLC - "https://github.com/google/ngx_brotli/archive/${NGX_BROTLI_MODUL
 
 # Target which builds brotli extension for nginx
 # @see https://github.com/lunatic-cat/docker-nginx-brotli
-FROM nginx:${NGINX_VERSION}-alpine as docker-nginx-brotli-so-build
+FROM nginx:${NGINX_VERSION}-alpine as nginx-brotli-so-build
 
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
-WORKDIR /docker-nginx-brotli-so-build
+WORKDIR /nginx-brotli-so-build
 
 # For latest build deps, see https://github.com/nginxinc/docker-nginx/blob/master/mainline/alpine/Dockerfile
 RUN apk add --no-cache --virtual .build-deps \
@@ -57,7 +57,7 @@ RUN CONFARGS=$(nginx -V 2>&1 | sed -n -e 's/^.*arguments: //p') \
   tar -zxf "nginx-${NGINX_VERSION}.tar.gz" && \
   tar -xzf "ngx_brotli-${NGX_BROTLI_MODULE_COMMIT}.tar.gz"
 
-WORKDIR /docker-nginx-brotli-so-build/nginx-${NGINX_VERSION}
+WORKDIR /nginx-brotli-so-build/nginx-${NGINX_VERSION}
 
 RUN ./configure --with-compat $CONFARGS --add-dynamic-module="$(pwd)/../ngx_brotli-${NGX_BROTLI_MODULE_COMMIT}" && \
   make && make install
@@ -68,8 +68,8 @@ RUN mkdir -p /so-deps/lib && \
 
 FROM scratch
 
-COPY --from=docker-nginx-brotli-so-build \
+COPY --from=nginx-brotli-so-build \
   /so-deps \
   /usr/local/nginx/modules/ngx_http_brotli_filter_module.so \
   /usr/local/nginx/modules/ngx_http_brotli_static_module.so \
-  /docker-nginx-brotli-so/
+  /nginx-brotli-so/
