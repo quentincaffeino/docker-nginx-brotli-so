@@ -1,4 +1,4 @@
-ARG NGINX_VERSION=1.19.10
+ARG NGINX_VERSION=1.20.0
 
 FROM ghcr.io/quentincaffeino/nginx-brotli-so:${NGINX_VERSION}-alpine as nginx-brotli-so
 
