@@ -8,8 +8,7 @@ FROM nginx:${NGINX_VERSION}-alpine
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
 COPY --from=nginx-brotli-so /nginx-brotli-so/lib/* /usr/lib/
-COPY --from=nginx-brotli-so /nginx-brotli-so/ngx_http_brotli_filter_module.so /etc/nginx/modules/ngx_http_brotli_filter_module.so
-COPY --from=nginx-brotli-so /nginx-brotli-so/ngx_http_brotli_static_module.so /etc/nginx/modules/ngx_http_brotli_static_module.so
+COPY --from=nginx-brotli-so /nginx-brotli-so/*.so /etc/nginx/modules/
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY index.html /usr/share/nginx/html/
