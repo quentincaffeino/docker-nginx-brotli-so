@@ -11,8 +11,7 @@ WORKDIR /tmp
 ARG NGX_BROTLI_MODULE_COMMIT
 
 RUN apk add --no-cache curl && \
-  curl -OLC - "https://github.com/google/ngx_brotli/archive/${NGX_BROTLI_MODULE_COMMIT}.tar.gz" \
-  && ls -al /tmp
+  curl -OLC - "https://github.com/google/ngx_brotli/archive/${NGX_BROTLI_MODULE_COMMIT}.tar.gz"
 
 
 # Target which builds brotli extension for nginx
@@ -69,6 +68,8 @@ RUN ./configure --with-compat $CONFARGS --add-dynamic-module="$(pwd)/../ngx_brot
 RUN mkdir -p /so-deps/lib && \
   cp -L $(ldd /usr/local/nginx/modules/ngx_http_brotli_filter_module.so 2>/dev/null | grep '/usr/lib/' | awk '{ print $3 }' | tr '\n' ' ') /so-deps/lib
 
+
+# Final image with just SOs
 FROM scratch
 
 COPY --from=nginx-brotli-so-build \
