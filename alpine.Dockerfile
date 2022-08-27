@@ -6,12 +6,10 @@ FROM alpine:3.16 as download-ngx_brotli
 
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
-WORKDIR /tmp
-
 ARG NGX_BROTLI_MODULE_COMMIT
 
 RUN apk add --no-cache curl && \
-  curl -OLC - "https://github.com/google/ngx_brotli/archive/${NGX_BROTLI_MODULE_COMMIT}.tar.gz"
+  curl -OLC - "https://github.com/google/ngx_brotli/archive/${NGX_BROTLI_MODULE_COMMIT}.tar.gz" > "${NGX_BROTLI_MODULE_COMMIT}.tar.gz"
 
 
 # Target which builds brotli extension for nginx
@@ -51,13 +49,17 @@ RUN curl -OLC - "https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" > "ng
 ARG NGX_BROTLI_MODULE_COMMIT
 
 COPY --from=download-ngx_brotli \
-  "/tmp/${NGX_BROTLI_MODULE_COMMIT}.tar.gz" \
+  "/${NGX_BROTLI_MODULE_COMMIT}.tar.gz" \
   "./ngx_brotli-${NGX_BROTLI_MODULE_COMMIT}.tar.gz"
 
+RUN gzip -d "./nginx-${NGINX_VERSION}.tar.gz" && \
+  tar xvf "./nginx-${NGINX_VERSION}.tar"
+
+RUN gzip -d "./ngx_brotli-${NGX_BROTLI_MODULE_COMMIT}.tar.gz" && \
+  tar xvf "./ngx_brotli-${NGX_BROTLI_MODULE_COMMIT}.tar"
+
 # Reuse same cli arguments as the nginx:alpine image used to build
-RUN CONFARGS=$(nginx -V 2>&1 | sed -n -e 's/^.*arguments: //p') \
-  tar -zxf "nginx-${NGINX_VERSION}.tar.gz" && \
-  tar -xzf "ngx_brotli-${NGX_BROTLI_MODULE_COMMIT}.tar.gz"
+RUN CONFARGS=$(nginx -V 2>&1 | sed -n -e 's/^.*arguments: //p')
 
 WORKDIR /nginx-brotli-so-build/nginx-${NGINX_VERSION}
 

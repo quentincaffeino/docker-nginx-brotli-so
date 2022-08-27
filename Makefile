@@ -21,6 +21,6 @@ ${VERSIONS}:
 		--tag ghcr.io/${USER}/nginx-brotli-so:$@-alpine \
 		--file alpine.Dockerfile .
 
-## Build VERSIONS
+## Build all VERSIONS
 build:
 	$(QUIET) $(MAKE) -e ${VERSIONS}
