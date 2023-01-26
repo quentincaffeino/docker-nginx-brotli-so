@@ -6,6 +6,7 @@ This repo contains prebuild nginx module [ngx_brotli](https://github.com/google/
 
 ## Supported tags
 
+- 1.23.3
 - 1.23.2
 - 1.23.1
 - 1.23.0
