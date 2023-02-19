@@ -8,6 +8,9 @@ VERSIONS ?=
 ## Platforms to build
 PLATFORMS ?= 
 
+## Push images to regsitry or not
+PUSH_IMAGES ?= "--push"
+
 
 ${VERSIONS}:
 	$(QUIET) DOCKER_BUILDKIT=${DOCKER_BUILDKIT} docker buildx build \
@@ -17,7 +20,7 @@ ${VERSIONS}:
 		--cache-from type=local,src=/tmp/.buildx-cache/$@ \
 		--cache-to type=local,dest=/tmp/.buildx-cache-new/$@ \
 		--platform=${PLATFORMS} \
-		--push \
+		${PUSH_IMAGES} \
 		--tag ghcr.io/${USER}/nginx-brotli-so:$@-alpine \
 		--file alpine.Dockerfile .
 

@@ -7,30 +7,58 @@ on:
   schedule:
     - cron: "0 0 */4 * *"
 
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  PUSH_IMAGES: "${{ github.ref_name == 'master' && '--push' || '' }}"
+
 jobs:
-  docker-build:
+  log:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: 'Log git branch'
+        run: echo "${{ github.ref_name }}"
+
+      - name: 'Log github.event.inputs'
+        env:
+          INPUTS: ${{ toJson(github.event.inputs) }}
+        run: echo "$INPUTS"
+
+      - name: 'Log inputs'
+        env:
+          INPUTS: ${{ toJson(inputs) }}
+        run: echo "$INPUTS"
+
+      - name: 'Log env'
+        env:
+          ENV_STR: ${{ toJson(env) }}
+        run: echo "$ENV_STR"
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs:
+      - log
+    steps:
+      - name: Checkout
         uses: actions/checkout@v3
-      -
-        name: Set up QEMU
+
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
+
       # This is the a separate action that sets up buildx runner
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         id: buildx
         with:
           install: true
-      -
-        name: Builder instance name
+
+      - name: Builder instance name
         run: echo ${{ steps.buildx.outputs.name }}
-      -
-        name: Available platforms
+      
+      - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
+
       # So now you can use Actions' own caching!
       - name: Cache Docker layers
         uses: actions/cache@v3
@@ -39,16 +67,16 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ hashFiles('**/*.Dockerfile') }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-      -
-        name: Login to GitHub Container Registry
+
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Build and push images
-        run: make build USER=${{ github.repository_owner }} QUIET=
+
+      - name: Build and push images
+        run: make build USER=${{ github.repository_owner }} PUSH_IMAGES=$PUSH_IMAGES QUIET=
 
         # This ugly bit is necessary if you don't want your cache to grow forever
         # till it hits GitHub's limit of 5GB.
