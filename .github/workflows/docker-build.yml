@@ -11,6 +11,8 @@ on:
   workflow_dispatch:
 
 env:
+  CACHE_FROM: "/tmp/.buildx-cache"
+  CACHE_TO: "/tmp/.buildx-cache-new"
   PUSH_IMAGES: "${{ github.ref_name == 'master' && '--push' || '' }}"
 
 jobs:
@@ -40,6 +42,9 @@ jobs:
     needs:
       - log
     steps:
+      - name: Get number of CPU cores
+        uses: SimenB/github-actions-cpu-cores@v1
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -59,12 +64,11 @@ jobs:
       - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
 
-      # So now you can use Actions' own caching!
       - name: Cache Docker layers
         uses: actions/cache@v3
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ hashFiles('**/*.Dockerfile') }}
+          path: ${{ env.CACHE_FROM }}
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
 
@@ -76,7 +80,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push images
-        run: make build USER=${{ github.repository_owner }} PUSH_IMAGES=$PUSH_IMAGES QUIET=
+        env:
+          JOBS: "${{ steps.cpu-cores.outputs.count }}"
+        run: |
+          make \
+            -j${JOBS} \
+            build \
+            USER=${{ github.repository_owner }} \
+            PUSH_IMAGES=$PUSH_IMAGES \
+            QUIET=
 
         # This ugly bit is necessary if you don't want your cache to grow forever
         # till it hits GitHub's limit of 5GB.
@@ -85,5 +97,5 @@ jobs:
         # https://github.com/moby/buildkit/issues/1896
       - name: Move cache
         run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          rm -rf "${CACHE_FROM}"
+          mv "${CACHE_TO}" "${CACHE_FROM}"
