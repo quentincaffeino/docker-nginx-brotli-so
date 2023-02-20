@@ -17,8 +17,8 @@ ${VERSIONS}:
 		--build-arg NGX_BROTLI_MODULE_COMMIT=${NGX_BROTLI_MODULE_COMMIT} \
 		--build-arg NGINX_VERSION=$@ \
 		--compress \
-		--cache-from type=local,src=/tmp/.buildx-cache/$@ \
-		--cache-to type=local,dest=/tmp/.buildx-cache-new/$@ \
+		"--cache-from=type=local,src=${CACHE_FROM}/$@" \
+		"--cache-to=type=local,dest=${CACHE_TO}/$@" \
 		--platform=${PLATFORMS} \
 		${PUSH_IMAGES} \
 		--tag ghcr.io/${USER}/nginx-brotli-so:$@-alpine \
