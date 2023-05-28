@@ -2,7 +2,7 @@ ARG NGINX_VERSION=1.19.10
 ARG NGX_BROTLI_MODULE_COMMIT=9aec15e2aa6feea2113119ba06460af70ab3ea62
 
 
-FROM alpine:3.16 as download-ngx_brotli
+FROM alpine:3.18 as download-ngx_brotli
 
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
